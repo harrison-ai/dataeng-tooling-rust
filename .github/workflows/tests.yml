@@ -1,0 +1,12 @@
+name: Check that a PR is ready for merge
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check version number consistency
+        run: ./scripts/check-pr.sh
