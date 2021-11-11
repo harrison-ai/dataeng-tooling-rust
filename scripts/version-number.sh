@@ -7,6 +7,8 @@
 # built from commits as soon as they merge to master.
 #
 
+set -e
+
 # By default this script will read the latest version number from the changelog
 # in the git `HEAD` ref, but you can pass a specific git ref as first argument.
 GITREF="${1-HEAD}"

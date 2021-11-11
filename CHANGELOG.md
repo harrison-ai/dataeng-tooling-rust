@@ -9,6 +9,12 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.56-0.2
+
+### Added
+
+- A test of the version number checking.
+
 ## 1.56-0.1
 
 ### Added

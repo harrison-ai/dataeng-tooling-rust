@@ -1,3 +1,9 @@
+# This workflow automatically builds and publishes the docker image
+# for every push to the `main` branch. We rely on branch protection
+# to ensure that all changes to `main` have gone through a PR, and
+# on the separate `tests` workflow to ensure that every PR properly
+# increments the version info in a way that's safe to publish.
+
 name: Publish docker images from main
 
 on:

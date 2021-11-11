@@ -12,6 +12,8 @@
 # (and suggestions of a better way are welcome!) but it makes it nice and
 # easy and quick to run in CI, so here we are...
 
+set -e
+
 OLD_VERSION="${1-}"
 NEW_VERSION="${2-}"
 

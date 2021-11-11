@@ -8,8 +8,10 @@
 # and image from it as soon as it lands.
 #
 
+set -e
+
 THIS_VERSION=`./scripts/version-number.sh`
-MAIN_VERSION=`./scripts/version-number.sh test-main`
+MAIN_VERSION=`./scripts/version-number.sh ${GITHUB_BASE_SHA-test-main}`
 
 if [ -z "${THIS_VERSION}" ]; then
     echo "ERROR: no version number for the current checkout" 1>&2
@@ -23,9 +25,9 @@ fi
 
 if ./scripts/check-version-increment.sh "${MAIN_VERSION}" "${THIS_VERSION}"; then true; else
     echo ""
-    echo "Please update CHANGELOG.md with a new version number"
-    echo "and a description of what has changed, so that we can"
-    echo "automatically publish this change once it is merged."
+    echo "Please update CHANGELOG.md with an appropriate new version number"
+    echo "and a description of what has changed, so that we can automatically"
+    echo "publish this change once it is merged."
     echo ""
     exit 1
 fi

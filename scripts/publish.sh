@@ -3,6 +3,8 @@
 # Publish the current git HEAD to dockerhub, if it's the main branch.
 #
 
+set -e
+
 IMAGE="rfkelly/rust-tooling"
 
 # We only ever publish from a clean checkout of `main`.
@@ -30,7 +32,9 @@ docker build -t "${IMAGE}:latest" \
     -t "${IMAGE}:${RUST_VERSION}" \
     .
 
-docker push "${IMAGE}:latest"
-docker push "${IMAGE}:${VERSION}"
-docker push "${IMAGE}:${OUR_MAJOR_VERSION}"
-docker push "${IMAGE}:${RUST_VERSION}"
+# permission issues mean it's not going to work, just echo for now
+
+echo docker push "${IMAGE}:latest"
+echo docker push "${IMAGE}:${VERSION}"
+echo docker push "${IMAGE}:${OUR_MAJOR_VERSION}"
+echo docker push "${IMAGE}:${RUST_VERSION}"
