@@ -1,0 +1,24 @@
+# This workflow checks that the contents of the PR are ready for
+# publishing as soon as they land in `main`. Most importantly it
+# checks that a new version number has been assigned as part of the
+# change and it's basically consistent with our release policy.
+
+name: Check that a PR is ready for merge to main
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+  GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Check version number consistency
+        run: ./scripts/check-pr.sh

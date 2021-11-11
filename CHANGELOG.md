@@ -9,6 +9,13 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.56-0.1
+
+### Added
+
+- The first release of this docker image, including Rust version `1.56.1` and
+  some basic scripting around `cargo-deny`.
+
 ## 1.56-0.0
 
 This is a stub version for the initial commit, not corresponding to an
