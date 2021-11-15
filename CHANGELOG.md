@@ -9,6 +9,19 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.56-0.2
+
+### Changed
+
+- The bundled `cargo-deny` now links against the system OpenSSL rather than
+  its own bundled copy.
+
+### Removed
+
+- The base image now derives from the "slim" debian variant, meaning that
+  a lot of system tools have been removed. For example, `curl` is no longer
+  present by default in the image.
+
 ## 1.56-0.1
 
 ### Added
