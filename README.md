@@ -9,6 +9,8 @@ The docker image provides:
 * Rust, rustup, cargo and friends, like you'd get from a standard Rust dev image.
 * Pre-configured components and settings to cross-compile for `aarch64` targets,
   for deployment to AWS
+* Pre-configured components and settings to cross-compile static binaries for x86\_64-unknown-linux targets,
+  with zlib and openssl statically compiled.
 * [`cargo-deny`](https://embarkstudios.github.io/cargo-deny/) and some default
   configuration for checking dependency licenses and security warnings.
 * A custom `cargo hai-all-checks` command to easily run our standard suite of
