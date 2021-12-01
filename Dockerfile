@@ -59,14 +59,22 @@ RUN mkdir $PREFIX && \
     ln -s /usr/include/linux /usr/include/x86_64-linux-musl/linux
 
 # Build zlib used in openssl
-RUN curl -sSL https://zlib.net/zlib-$ZLIB_VER.tar.gz | tar xz && \
+RUN curl -sSL https://zlib.net/zlib-$ZLIB_VER.tar.gz > zlib-${ZLIB_VER}.tar.gz && \
+    echo "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1" \
+    zlib-${ZLIB_VER}.tar.gz | sha256sum --check && \
+    tar -xzf zlib-${ZLIB_VER}.tar.gz && \
+    rm zlib-${ZLIB_VER}.tar.gz && \
     cd zlib-$ZLIB_VER && \
     CC="musl-gcc -fPIC -pie" LDFLAGS="-L$PREFIX/lib" CFLAGS="-I$PREFIX/include" ./configure --static --prefix=$PREFIX && \
     make -j$(nproc) && make install && \
     cd .. && rm -rf zlib-$ZLIB_VER
 
 # Build openssl 
-RUN curl -sSL https://www.openssl.org/source/openssl-$SSL_VER.tar.gz | tar xz && \
+RUN curl -sSL https://www.openssl.org/source/openssl-${SSL_VER}.tar.gz > openssl-${SSL_VER}.tar.gz && \
+    echo "0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1" \
+    openssl-${SSL_VER}.tar.gz | sha256sum --check && \
+    tar -xzf openssl-${SSL_VER}.tar.gz && \
+    rm openssl-${SSL_VER}.tar.gz && \
     cd openssl-$SSL_VER && \
     ./Configure no-shared -fPIC --prefix=$PREFIX --openssldir=$PREFIX/ssl linux-x86_64 && \
     env C_INCLUDE_PATH=$PREFIX/include make depend 2> /dev/null && \
