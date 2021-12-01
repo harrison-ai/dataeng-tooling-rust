@@ -9,6 +9,11 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.56-0.3
+
+- Added x86_64-unknown-linux-musl cargo target support.
+- Add static compliation of openssl and zlib.
+
 ## 1.56-0.2
 
 ### Changed
