@@ -9,6 +9,11 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.56-0.5
+
+- Sped up build time of the docker image by sharing build artifacts
+  between runs of `cargo install`.
+
 ## 1.56-0.4
 
 - Added `cargo-about` for generating a license file describing the
