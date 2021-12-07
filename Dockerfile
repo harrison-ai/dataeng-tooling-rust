@@ -26,7 +26,12 @@ RUN rustup component add clippy
 # Used for dependency license and security checks.
 # Disabling default features lets it use the system ssl library,
 # which should reduce overall size of the docker image.
-RUN cargo install --version="0.10.1" --no-default-features cargo-deny \
+RUN cargo install --version="0.11.0" --no-default-features cargo-deny \
+  && rm -rf "$CARGO_HOME/registry"
+
+# Used for generating license files for distribution to consumers,
+# which may be required to compliance with some open-source licenses.
+RUN cargo install --version="0.4.3" cargo-about \
   && rm -rf "$CARGO_HOME/registry"
 
 # Configure cross-compilation support for AWS Graviton2 processors,

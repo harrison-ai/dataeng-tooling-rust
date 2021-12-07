@@ -9,6 +9,15 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.56-0.4
+
+- Added `cargo-about` for generating a license file describing the
+  open-source dependencies used in a project.
+- Updated `cargo-deny` to v0.11.0. This is a semver-breaking change
+  for `cargy-deny` because it updated its minimum supported Rust version
+  to 1.561, but we're already on that version of Rust anyway so it's
+  not semver-breaking for this docker image.
+
 ## 1.56-0.3
 
 - Added x86_64-unknown-linux-musl cargo target support.
