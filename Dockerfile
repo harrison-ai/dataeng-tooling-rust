@@ -2,7 +2,7 @@
 # Configures a Rust and Cargo dev environment with the specific
 # tools needed for working on harrison.ai Rust projects.
 #
-FROM rust:1.56.1-slim
+FROM rust:1.57.0-slim
 
 # Install extra system dependencies not included in the slim base image.
 RUN apt-get update \
@@ -28,17 +28,14 @@ RUN rustup component add clippy
 # so that cargo can share intermediate compile artifacts rather than
 # having to build everything from scratch, which saves a lot of compile
 # time in release mode.
-# Disabling default features lets it use the system ssl library,
-# which should reduce overall size of the docker image.
 RUN export CARGO_TARGET_DIR=/tmp/cargo-install-target \
-
   # cargo-deny: used for dependency license and security checks.
+  # Disabling default features lets it use the system ssl library,
+  # which should reduce overall size of the docker image.
   && cargo install --version="0.11.0" --no-default-features cargo-deny \
-
   # cargo-about: used for generating license files for distribution to consumers,
   #              which may be required for compliance with some open-source licenses.
   && cargo install --version="0.4.3" cargo-about \
-
   # Remove temporary files from the final image.
   && rm -rf "$CARGO_HOME/registry" /tmp/cargo-install-target
 
