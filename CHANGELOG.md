@@ -9,6 +9,10 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.57-0.1
+
+- Updated Rust version to `1.57.0`.
+
 ## 1.56-0.5
 
 - Sped up build time of the docker image by sharing build artifacts
