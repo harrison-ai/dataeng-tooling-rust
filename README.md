@@ -11,8 +11,9 @@ The docker image provides:
   for deployment to AWS
 * Pre-configured components and settings to cross-compile static binaries for x86\_64-unknown-linux targets,
   with zlib and openssl statically compiled.
-* [`cargo-deny`](https://embarkstudios.github.io/cargo-deny/) and some default
-  configuration for checking dependency licenses and security warnings.
+* Useful project-lifecycle-management tools such as `cargo deny` for auditing
+  dependency licenses, `cargo about` for generating a license summary, and
+  `cargo release` for cutting releases.
 * A custom `cargo hai-all-checks` command to easily run our standard suite of
   quality checks from a CI environment.
 

@@ -36,6 +36,8 @@ RUN export CARGO_TARGET_DIR=/tmp/cargo-install-target \
   # cargo-about: used for generating license files for distribution to consumers,
   #              which may be required for compliance with some open-source licenses.
   && cargo install --version="0.4.3" cargo-about \
+  # cargo-release: used for cutting releases.
+  && cargo install --version="0.19.3" cargo-release \
   # Remove temporary files from the final image.
   && rm -rf "$CARGO_HOME/registry" /tmp/cargo-install-target
 
