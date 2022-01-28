@@ -10,6 +10,9 @@ RUN apt-get update \
     # For helping to build some Rust crates.
     libssl-dev \
     pkg-config \
+    # For their general extreme usefulness.
+    jq \
+    curl \
     # For cross-compilation to AWS Graviton2.
     gcc-aarch64-linux-gnu \
     libc-dev-arm64-cross \
