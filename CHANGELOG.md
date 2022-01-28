@@ -9,6 +9,11 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.57-0.3
+
+- Added `curl` and `jq` to the image, since we've been frequently finding
+  ourselves needing these for customization.
+
 ## 1.57-0.2
 
 - Added `cargo-release` to the image, for easily cutting releases.
