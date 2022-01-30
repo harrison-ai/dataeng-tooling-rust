@@ -9,6 +9,10 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.58-0.1
+
+- Updated Rust version to `1.58.1`.
+
 ## 1.57-0.3
 
 - Added `curl` and `jq` to the image, since we've been frequently finding
