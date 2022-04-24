@@ -2,7 +2,7 @@
 # Configures a Rust and Cargo dev environment with the specific
 # tools needed for working on harrison.ai Rust projects.
 #
-FROM rust:1.58.1-slim
+FROM rust:1.60.0-slim
 
 # Install extra system dependencies not included in the slim base image.
 RUN apt-get update \
