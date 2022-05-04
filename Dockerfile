@@ -2,7 +2,7 @@
 # Configures a Rust and Cargo dev environment with the specific
 # tools needed for working on harrison.ai Rust projects.
 #
-FROM rust:1.58.1-slim
+FROM rust:1.60-slim
 
 # Install extra system dependencies not included in the slim base image.
 RUN apt-get update \
@@ -35,12 +35,12 @@ RUN export CARGO_TARGET_DIR=/tmp/cargo-install-target \
   # cargo-deny: used for dependency license and security checks.
   # Disabling default features lets it use the system ssl library,
   # which should reduce overall size of the docker image.
-  && cargo install --version="0.11.0" --no-default-features cargo-deny \
+  && cargo install --version="0.11.4" --no-default-features cargo-deny \
   # cargo-about: used for generating license files for distribution to consumers,
   #              which may be required for compliance with some open-source licenses.
-  && cargo install --version="0.4.3" cargo-about \
+  && cargo install --version="0.5.1" cargo-about \
   # cargo-release: used for cutting releases.
-  && cargo install --version="0.19.3" cargo-release \
+  && cargo install --version="0.20.5" cargo-release \
   # Remove temporary files from the final image.
   && rm -rf "$CARGO_HOME/registry" /tmp/cargo-install-target
 
@@ -57,7 +57,7 @@ ENV AR_aarch64_unknown_linux_gnu=aarch64-linux-gnu-ar
 # Extra stuff required for x86_64 musl
 # openssl crate supports OpenSSL 1.0.1 to 1.1.1 (not 3.0.0)
 ENV SSL_VER="1.1.1l" \
-    ZLIB_VER="1.2.11" \
+    ZLIB_VER="1.2.12" \
     CC=musl-gcc \
     PREFIX=/musl \
     PATH=/usr/local/bin:/root/.cargo/bin:$PATH \
@@ -75,7 +75,7 @@ RUN mkdir $PREFIX && \
 
 # Build zlib used in openssl
 RUN curl -sSL https://zlib.net/zlib-$ZLIB_VER.tar.gz > zlib-${ZLIB_VER}.tar.gz && \
-    echo "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1" \
+    echo "91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9" \
     zlib-${ZLIB_VER}.tar.gz | sha256sum --check && \
     tar -xzf zlib-${ZLIB_VER}.tar.gz && \
     rm zlib-${ZLIB_VER}.tar.gz && \
