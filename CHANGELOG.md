@@ -16,6 +16,7 @@ get CI passing and enable the changes to land on `main`.
 - Updated `cargo-about` to `0.5.1`
 - Updated `cargo-release` to `0.20.5`
 - Updated `zlib` to `1.2.12`
+- Updated GitHub Actions docker images
 
 ## 1.58-0.1
 
