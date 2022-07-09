@@ -7,10 +7,9 @@ for working with Rust-based projects in the harrison.ai Data Engineering team.
 The docker image provides:
 
 * Rust, rustup, cargo and friends, like you'd get from a standard Rust dev image.
-* Pre-configured components and settings to cross-compile for `aarch64` targets,
-  for deployment to AWS
-* Pre-configured components and settings to cross-compile static binaries for x86\_64-unknown-linux targets,
-  with zlib and openssl statically compiled.
+* Pre-configured components and settings to cross-compile static binaries for both
+  `x86_64` and `aarch64` using musl, including support for common system dependencies
+  like openssl.
 * Useful project-lifecycle-management tools such as `cargo deny` for auditing
   dependency licenses, `cargo about` for generating a license summary, and
   `cargo release` for cutting releases.
@@ -59,6 +58,27 @@ docker-compose run --rm cargo build
 
 We plan to publish a cookiecutter Rust project using this pattern, once we've
 stabilised some of the details.
+
+## Building the image
+
+To build the image, you'll need [Docker Buildx](https://docs.docker.com/buildx/working-with-buildx/)
+with support for both `amd64` and `arm64` platforms.
+
+If you're using one of the Docker Desktop environments then there's a good chance you have all
+the necessary components already. Try running `docker buildx inspect default` and see if it
+lists both `linux/amd64` and `linux/arm64` as supported platforms.
+
+To locally build and test the image on both supported platforms:
+
+```sh
+make test
+```
+
+To build the image and publish it to dockerhub:
+
+```sh
+make publish
+```
 
 ## Tags and Versioning
 

@@ -16,12 +16,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
+      - name: Set up QEMU for Docker
+        uses: docker/setup-qemu-action@v2
+        with:
+            platforms: arm64
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache docker build artifacts
+        uses: actions/cache@v2
+        with:
+          path: |
+            /tmp/buildx-cache/
+          key: docker-buildx-${{ hashFiles('./Makefile', './Dockerfile', './scripts/*') }}
+          restore-keys: |
+            docker-buildx-
+
       - name: Log in to Docker Hub
         uses: docker/login-action@3a136a8631bbc4ca05cc2f33d3a19059e9255bae
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      
+
       - name: Build and publish the images
         run: make publish
+
+      - name: Only keep the latest images in docker cache
+        run: |
+          rm -rf /tmp/buildx-cache
+          mv /tmp/buildx-cache-new /tmp/buildx-cache

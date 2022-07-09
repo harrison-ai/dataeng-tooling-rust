@@ -9,6 +9,25 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.60-1.0
+
+- Publish both `amd64` and `arm64` docker images. This should provide
+  for a much faster build experience for users on aarch64 platforms,
+  in particular the Mac M1. Several significant breaking changes have
+  been introduced to support this changes:
+  - Cargo now builds for the `-musl` target of the host platform by default, meaning
+    it will produce build artifacts under `/target/[x86_64|aarch64]-unkown-linux-musl/`
+    rather than the default `./target/`.
+  - The details and layout of musl build tooling in the image was significantly
+    refactored. Users depending on the availability of e.g. `musl-gcc` will need
+    to review what tools are available in the new image and adjust their usage
+    accordingly.
+  - Docker image building is now performed using `docker buildx`, which in addition
+    to simplifying support for multi-platform images, brings a number of efficiency
+    and cachability benefits.
+- Removed zlib as a pre-built system dependency, as it doesn't seem to be
+  needed in practice.
+
 ## 1.60-0.2
 
 - Bump GitHub Actions docker digest
@@ -49,8 +68,8 @@ get CI passing and enable the changes to land on `main`.
 - Added `cargo-about` for generating a license file describing the
   open-source dependencies used in a project.
 - Updated `cargo-deny` to v0.11.0. This is a semver-breaking change
-  for `cargy-deny` because it updated its minimum supported Rust version
-  to 1.561, but we're already on that version of Rust anyway so it's
+  for `cargo-deny` because it updated its minimum supported Rust version
+  to 1.56.1, but we're already on that version of Rust anyway so it's
   not semver-breaking for this docker image.
 
 ## 1.56-0.3

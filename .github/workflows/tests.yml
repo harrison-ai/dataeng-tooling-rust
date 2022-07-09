@@ -20,7 +20,33 @@ jobs:
       - uses: actions/checkout@v3
         with:
             fetch-depth: 0
+
       - name: Check version number consistency
         run: ./scripts/check-pr.sh
-      - name: Check that the image can be successfully built
-        run: docker build .
+
+      - name: Set up QEMU for Docker
+        uses: docker/setup-qemu-action@v2
+        with:
+            platforms: arm64
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Cache docker build artifacts
+        uses: actions/cache@v2
+        with:
+          path: |
+            /tmp/buildx-cache/
+          key: docker-buildx-${{ hashFiles('./Makefile', './Dockerfile', './scripts/*') }}
+          restore-keys: |
+            docker-buildx-
+
+      - name: Check that the images can be built and used
+        run: make test
+
+      - name: Only keep the latest images in docker cache
+        run: |
+          rm -rf /tmp/buildx-cache
+          mv /tmp/buildx-cache-new /tmp/buildx-cache
+

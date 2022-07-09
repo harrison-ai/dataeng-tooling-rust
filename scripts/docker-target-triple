@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Print the appropriate cargo --target triple to use for compiling for the docker target platform.
+#
+# This is a useful little helper for making a platform-agnostic Dockerfile.
+# It's quite annoying that the values of $TARGETARCH used by docker do not coincide with the arch names
+# used by cargo, but here we are...
+
+if [ "$TARGETARCH" = "amd64" ]; then
+    echo "x86_64-unknown-linux-musl"
+else if [ "$TARGETARCH" = "arm64" ]; then
+    echo "aarch64-unknown-linux-musl"
+else if [ -z "$TARGETARCH" ]; then
+    echo "Missing \$TARGETARCH, are you running inside a docker build?" 1>&2
+    exit 1
+else
+    echo "Unsupport docker target platform: ${TARGETPLATFORM:-${TARGETARCH}}" 1>&2
+    exit 1
+fi; fi; fi;
