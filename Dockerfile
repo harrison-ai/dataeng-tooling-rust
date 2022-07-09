@@ -1,110 +1,250 @@
+########
 #
-# Configures a Rust and Cargo dev environment with the specific
-# tools needed for working on harrison.ai Rust projects.
+# Docker image for a Rust and Cargo dev environment at harrison.ai.
 #
+# This Dockerfile builds on the standard `rust` Docker image, providing
+# extra configuration and tools that we use when working on Rust projects
+# at harrison.ai and partner ventures.
+#
+# We are specifically targetting a kind of 4-way matrix of host and target
+# achitectures with this toolchain:
+#
+#  - We want to be able to produce statically-compiled binaries for both
+#    `x86_64` targets (for deployment to generic Linux machines) and `aarch64`
+#    targets (for deployment to AWS Graviton in the cloud)
+#
+#  - We want to be able to do it from either an `x86_64` host (typical Windows
+#    or Linux dev machine) or an `aarch64` host (newer Mac dev machines)
+#
+# The image uses musl and Rust's support for musl-based cross-compilation
+# to support all four scenarios from a single Dockerfile, and uses the builder
+# pattern described at [1] for efficiently building the images.
+#
+# [1] https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
+# 
+########
+
+####
+#
+# Builder image.
+#
+# This runs on the native architecture of the build platform, and is where
+# we want to do all the compute-heavy compilation tasks like installing rust
+# tools from source, or compiling binary system dependencies. Such artifacts
+# are cross-compiled for inclusion in the runtime image.
+#
+####
+
+FROM --platform=$BUILDPLATFORM rust:1.60-slim AS builder
+
+WORKDIR /build
+
+## First, we're going to do all the build tasks that do not depend on $TARGETPLATFORM.
+##
+## This will allow the docker build cache to share the resulting artifacts between
+## different $TARGETPLATFORM builds.
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  apt-get update  && \
+  apt-get install -y --no-install-recommends \
+    curl \
+    make \
+    pkg-config \
+    gcc-aarch64-linux-gnu \
+    linux-libc-dev-amd64-cross \
+    gcc-x86-64-linux-gnu \
+    linux-libc-dev-arm64-cross
+
+# Build musl, for both target architectures.
+#
+# Rust ships with its own pre-compiled musl libs for each target platform, but crates that
+# compile C code need a more complete musl compiler environment. Using the existing `musl-tools`
+# package would work for native builds, but doesn't help us when cross-compiling. For simplicity
+# and consistency, we ship a build of musl for both of the target architectures.
+#
+# This will produce `/musl/x86_64/` and `/musl/aarch64/` respectively.
+
+ENV MUSL_VER="1.2.3" \
+    MUSL_PREFIX=/musl
+
+RUN curl -sSL https://git.musl-libc.org/cgit/musl/snapshot/musl-${MUSL_VER}.tar.gz > musl-${MUSL_VER}.tar.gz && \
+    echo "0504e33a974971ad21cd49213f21a2ff93440f81826b806e57862547abe9b9cf" \
+    musl-${MUSL_VER}.tar.gz | sha256sum --check
+
+RUN tar -xzf musl-${MUSL_VER}.tar.gz && \
+    cd musl-${MUSL_VER} && \
+    CC=x86_64-linux-gnu-gcc ./configure --prefix=${MUSL_PREFIX}/amd64 --enable-wrapper=gcc --disable-shared && \
+    make -j$(nproc) && \
+    make install && \
+    cd .. && rm -rf musl-${MUSL_VER}
+
+RUN tar -xzf musl-${MUSL_VER}.tar.gz && \
+    cd musl-${MUSL_VER} && \
+    CC=aarch64-linux-gnu-gcc ./configure --prefix=${MUSL_PREFIX}/arm64 --enable-wrapper=gcc --disble-shared && \
+    make -j$(nproc) && \
+    make install && \
+    cd .. && rm -rf musl-${MUSL_VER}
+
+# Add some helper tools for compiling with those versions of musl.
+# This is mostly about providing tools with standard names, to avoid having to configure
+# various buildscripts with custom tools.
+
+ENV PATH=${MUSL_PREFIX}/bin:$PATH
+
+COPY ./scripts/x86_64-linux-musl-gcc ${MUSL_PREFIX}/bin/x86_64-linux-musl-gcc
+RUN ln -s /usr/bin/x86_64-linux-gnu-ar ${MUSL_PREFIX}/bin/x86-64-linux-musl-ar
+
+COPY ./scripts/aarch64-linux-musl-gcc ${MUSL_PREFIX}/bin/aarch64-linux-musl-gcc
+RUN ln -s /usr/bin/aarch64-linux-gnu-ar ${MUSL_PREFIX}/bin/aarch64-linux-musl-ar
+
+# Build OpenSSL with our musl toolchain.
+#
+# OpenSSL is unfortunately a common dependency in the Rust ecosystem, and it's fiddly to use
+# with cross-compiled static targets, so we provide it as a pre-built dependency. As with musl itself, 
+# for simplicity and consistency, we ship a build for both of the target architectures.
+
+ENV SSL_VER="1.1.1l"
+
+RUN curl -sSL https://www.openssl.org/source/openssl-${SSL_VER}.tar.gz > openssl-${SSL_VER}.tar.gz && \
+    echo "0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1" \
+    openssl-${SSL_VER}.tar.gz | sha256sum --check
+
+RUN tar -xzf openssl-${SSL_VER}.tar.gz && \
+    cd openssl-${SSL_VER} && \
+    CC="x86_64-linux-musl-gcc -static" ./Configure no-shared -fPIC -I/usr/x86_64-linux-gnu/include --prefix=${MUSL_PREFIX}/amd64 --openssldir=${MUSL_PREFIX}/amd64/ssl linux-x86_64 && \
+    make depend && \
+    make -j$(nproc) && make install_sw && \
+    cd .. && rm -rf openssl-${SSL_VER}
+
+RUN tar -xzf openssl-${SSL_VER}.tar.gz && \
+    cd openssl-${SSL_VER} && \
+    CC="aarch64-linux-musl-gcc -static" ./Configure no-shared -fPIC -I/usr/aarch64-linux-gnu/include --prefix=${MUSL_PREFIX}/arm64 --openssldir=${MUSL_PREFIX}/arm64/ssl linux-aarch64 && \
+    make depend && \
+    make -j$(nproc) && make install_sw && \
+    cd .. && rm -rf openssl-${SSL_VER}
+
+# Configure cargo to use the right musl bits and pieces.
+# The runtime image also needs these, so make sure any changes are applied in both places.
+
+ENV CC_x86_64_unknown_linux_musl=x86_64-linux-musl-gcc \
+    CC_aarch64_unknown_linux_musl=aarch64-linux-musl-gcc \
+    X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=${MUSL_PREFIX}/amd64 \
+    AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=${MUSL_PREFIX}/arm64
+
+
+## From here, we can start doing things that depend on $TARGETPLATFORM.
+##
+## We won't be able to re-use the resulting artifacts across docker build runs for
+## different platforms, but at least they'll build quickly because they're running
+## in the native builder image.
+
+ARG TARGETPLATFORM
+ARG TARGETARCH
+
+# We build with a shared target-dir so that cargo can share intermediate compile artifacts
+# rather than aving to build everything from scratch, which saves a lot of compile time
+# in release mode.
+
+COPY ./scripts/docker-target-triple ./
+
+RUN rustup target add `./docker-target-triple`
+
+ENV CARGO_TARGET_DIR=/build/target
+
+# Default to building for the appropriate musl target on this platform.
+# This ensures that e.g. running tests without specifying an explicit target,
+# will use all the musl stuff that we configured above.
+
+RUN echo "[build]\ntarget=\"`./docker-target-triple`\"" > ${CARGO_HOME}/config.toml
+
+# Build some helpful extra Rust utilities.
+#
+# It seems that `cargo install` needs a bit of extra help in order to cross-compile,
+# which is fair enough, that's not really what it's for. But it works, with some help
+# from $RUSTFLAGS.
+#
+# The use of `sharing=locked` here is to prevent two instances of the install from updating
+# the local registry cache at the same time, which can cause one to fail. Ideally we would
+# only hold the lock while updating the registry cache, rather than while doing the whole
+# build...but cargo doesn't seem to have a separate "update the registry cache" operation.
+
+RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
+  --mount=type=cache,target=/build/target \
+  export CARGO_BUILD_TARGET=`./docker-target-triple` && \
+  export RUSTFLAGS="-C linker=rust-lld" && \
+  # cargo-deny: used for dependency license and security checks.
+  # Using `--no-default-features` prevents it trying to compile its own openssl.
+  cargo install --version="0.11.4" --no-default-features cargo-deny && \
+  # cargo-about: used for generating license files for distribution to consumers,
+  #              which may be required for compliance with some open-source licenses.
+  cargo install --version="0.5.1" cargo-about && \
+  # cargo-release: used for cutting releases.
+  cargo install --version="0.20.5" cargo-release
+
+####
+#
+# Runtime image
+#
+# This is the image that actually gets published and used, and we build a version of
+# it for each target platform.
+#
+# The instructions here are very likely to be executed under an emulator for at least
+# one of our target platforms, so you should be careful to avoid any CPU-intensive tasks.
+# Such work should be done in the builder image above, cross-compiling for $TARGETPLATFORM.
+#
+####
+
 FROM rust:1.60-slim
 
 # Install extra system dependencies not included in the slim base image.
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-    # For helping to build some Rust crates.
-    libssl-dev \
-    pkg-config \
-    # For their general extreme usefulness.
+RUN  --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  apt-get update  && \
+  apt-get install -y --no-install-recommends \
     jq \
     curl \
-    # For cross-compilation to AWS Graviton2.
-    gcc-aarch64-linux-gnu \
-    libc-dev-arm64-cross \
-    musl-tools \
-    curl \
     make \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+    ca-certificates \
+    gcc-aarch64-linux-gnu \
+    linux-libc-dev-amd64-cross \
+    gcc-x86-64-linux-gnu \
+    linux-libc-dev-arm64-cross
 
 # General dev tools.
 RUN rustup component add rustfmt
 RUN rustup component add clippy
 
-# Install some helpful extra Rust utilities.
-# We build these in a single `RUN` invocation with a shared target-dir
-# so that cargo can share intermediate compile artifacts rather than
-# having to build everything from scratch, which saves a lot of compile
-# time in release mode.
-RUN export CARGO_TARGET_DIR=/tmp/cargo-install-target \
-  # cargo-deny: used for dependency license and security checks.
-  # Disabling default features lets it use the system ssl library,
-  # which should reduce overall size of the docker image.
-  && cargo install --version="0.11.4" --no-default-features cargo-deny \
-  # cargo-about: used for generating license files for distribution to consumers,
-  #              which may be required for compliance with some open-source licenses.
-  && cargo install --version="0.5.1" cargo-about \
-  # cargo-release: used for cutting releases.
-  && cargo install --version="0.20.5" cargo-release \
-  # Remove temporary files from the final image.
-  && rm -rf "$CARGO_HOME/registry" /tmp/cargo-install-target
+# Our two main compilation targets.
+RUN rustup target add \
+  aarch64-unknown-linux-musl \
+  x86_64-unknown-linux-musl
 
-# Configure cross-compilation support for AWS Graviton2 processors,
-# and x86_64 linux static binary.
-# We use musl to help produce smaller docker images.
-RUN rustup target add aarch64-unknown-linux-musl x86_64-unknown-linux-musl
-ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-gnu-gcc
+# Copy the built musl system-level dependencies and associated config.
+ENV MUSL_PREFIX=/musl
 
-# Extra stuff required for cross-compiling the `ring` crate.
-ENV CC_aarch64_unknown_linux_musl=aarch64-linux-gnu-gcc
-ENV AR_aarch64_unknown_linux_gnu=aarch64-linux-gnu-ar
+COPY --from=builder ${MUSL_PREFIX} ${MUSL_PREFIX}
 
-# Extra stuff required for x86_64 musl
-# openssl crate supports OpenSSL 1.0.1 to 1.1.1 (not 3.0.0)
-ENV SSL_VER="1.1.1l" \
-    ZLIB_VER="1.2.12" \
-    CC=musl-gcc \
-    PREFIX=/musl \
-    PATH=/usr/local/bin:/root/.cargo/bin:$PATH \
-    PKG_CONFIG_PATH=/usr/local/lib/pkgconfig \
-    LD_LIBRARY_PATH=$PREFIX
+ENV PATH=${MUSL_PREFIX}/bin:$PATH
 
-# Set up a prefix for musl build libraries, make the linker's job of finding them easier
-# Primarily for the benefit of postgres.
-# Lastly, link some linux-headers for openssl 1.1 (not used herein)
-RUN mkdir $PREFIX && \
-    echo "$PREFIX/lib" >> /etc/ld-musl-x86_64.path && \
-    ln -s /usr/include/x86_64-linux-gnu/asm /usr/include/x86_64-linux-musl/asm && \
-    ln -s /usr/include/asm-generic /usr/include/x86_64-linux-musl/asm-generic && \
-    ln -s /usr/include/linux /usr/include/x86_64-linux-musl/linux
+# Configure cargo to use the right musl bits and pieces.
+# The builder image also needs these, so make sure any changes are applied in both places.
+ENV CC_x86_64_unknown_linux_musl=x86_64-linux-musl-gcc \
+    CC_aarch64_unknown_linux_musl=aarch64-linux-musl-gcc \
+    AR_x86_64_unknown_linux_musl=x86_64-linux-gnu-ar \
+    AR_aarch64_unknown_linux_musl=aarch64-linux-gnu-ar \
+    X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=${MUSL_PREFIX}/amd64 \
+    AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=${MUSL_PREFIX}/arm64
 
-# Build zlib used in openssl
-RUN curl -sSL https://zlib.net/zlib-$ZLIB_VER.tar.gz > zlib-${ZLIB_VER}.tar.gz && \
-    echo "91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9" \
-    zlib-${ZLIB_VER}.tar.gz | sha256sum --check && \
-    tar -xzf zlib-${ZLIB_VER}.tar.gz && \
-    rm zlib-${ZLIB_VER}.tar.gz && \
-    cd zlib-$ZLIB_VER && \
-    CC="musl-gcc -fPIC -pie" LDFLAGS="-L$PREFIX/lib" CFLAGS="-I$PREFIX/include" ./configure --static --prefix=$PREFIX && \
-    make -j$(nproc) && make install && \
-    cd .. && rm -rf zlib-$ZLIB_VER
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
+    SSL_CERT_DIR=/etc/ssl/certs
 
-# Build openssl 
-RUN curl -sSL https://www.openssl.org/source/openssl-${SSL_VER}.tar.gz > openssl-${SSL_VER}.tar.gz && \
-    echo "0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1" \
-    openssl-${SSL_VER}.tar.gz | sha256sum --check && \
-    tar -xzf openssl-${SSL_VER}.tar.gz && \
-    rm openssl-${SSL_VER}.tar.gz && \
-    cd openssl-$SSL_VER && \
-    ./Configure no-shared -fPIC --prefix=$PREFIX --openssldir=$PREFIX/ssl linux-x86_64 && \
-    env C_INCLUDE_PATH=$PREFIX/include make depend 2> /dev/null && \
-    make -j$(nproc) && make install_sw && \
-    cd .. && rm -rf openssl-$SSL_VER
+COPY --from=builder ${CARGO_HOME}/config.toml ${CARGO_HOME}/config.toml
 
-ENV PATH=$PREFIX/bin:$PATH \
-    PKG_CONFIG_ALLOW_CROSS=true \
-    PKG_CONFIG_ALL_STATIC=true \
-    PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig \
-    OPENSSL_STATIC=true \
-    OPENSSL_DIR=$PREFIX \
-    SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
-    SSL_CERT_DIR=/etc/ssl/certs \
-    LIBZ_SYS_STATIC=1
+# Copy the built additional cargo tooling.
+COPY --from=builder \
+  ${CARGO_HOME}/bin/cargo-deny \
+  ${CARGO_HOME}/bin/cargo-about \
+  ${CARGO_HOME}/bin/cargo-release \
+  ${CARGO_HOME}/bin/
 
-# An easy way to run our standard suite of CI checks.
-COPY ./scripts/cargo-hai-all-checks /usr/local/cargo/bin
+# Add additional not-natively-compiled cargo tooling.
+COPY ./scripts/cargo-hai-all-checks ${CARGO_HOME}/bin/

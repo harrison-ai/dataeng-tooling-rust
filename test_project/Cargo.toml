@@ -1,0 +1,11 @@
+[package]
+name = "test_project"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# These dependencies are not actually used by the test program, they're here
+# to check that our toolchain can successfully build them.
+ring = "0.16"
+openssl-sys = "0.9"
+

@@ -1,2 +1,5 @@
 .vscode
+.built.*
+test_project/target
+test_project/Cargo.lock
 **/.DS_Store

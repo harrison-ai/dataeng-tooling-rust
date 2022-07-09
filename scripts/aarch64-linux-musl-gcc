@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# This is your typical `musl-gcc` wrapper script, but configured to use
+# the appropriate musl build in the docker image.
+exec "aarch64-linux-gnu-gcc" "$@" -specs "${MUSL_PREFIX:-/musl}/arm64/lib/musl-gcc.specs"
