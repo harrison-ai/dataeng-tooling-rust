@@ -35,7 +35,7 @@
 #
 ####
 
-FROM --platform=$BUILDPLATFORM rust:1.60-slim AS builder
+FROM --platform=$BUILDPLATFORM rust:1.62.0-slim AS builder
 
 WORKDIR /build
 
@@ -103,10 +103,10 @@ RUN ln -s /usr/bin/aarch64-linux-gnu-ar ${MUSL_PREFIX}/bin/aarch64-linux-musl-ar
 # with cross-compiled static targets, so we provide it as a pre-built dependency. As with musl itself, 
 # for simplicity and consistency, we ship a build for both of the target architectures.
 
-ENV SSL_VER="1.1.1l"
+ENV SSL_VER="1.1.1q"
 
 RUN curl -sSL https://www.openssl.org/source/openssl-${SSL_VER}.tar.gz > openssl-${SSL_VER}.tar.gz && \
-    echo "0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1" \
+    echo "d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca" \
     openssl-${SSL_VER}.tar.gz | sha256sum --check
 
 RUN tar -xzf openssl-${SSL_VER}.tar.gz && \
@@ -174,12 +174,12 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
   export RUSTFLAGS="-C linker=rust-lld" && \
   # cargo-deny: used for dependency license and security checks.
   # Using `--no-default-features` prevents it trying to compile its own openssl.
-  cargo install --version="0.11.4" --no-default-features cargo-deny && \
+  cargo install --version="0.12.1" --no-default-features cargo-deny && \
   # cargo-about: used for generating license files for distribution to consumers,
   #              which may be required for compliance with some open-source licenses.
   cargo install --version="0.5.1" cargo-about && \
   # cargo-release: used for cutting releases.
-  cargo install --version="0.20.5" cargo-release
+  cargo install --version="0.21.0" cargo-release
 
 ####
 #
@@ -194,7 +194,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
 #
 ####
 
-FROM rust:1.60-slim
+FROM rust:1.62.0-slim
 
 # Install extra system dependencies not included in the slim base image.
 RUN  --mount=type=cache,target=/var/cache/apt,sharing=locked \

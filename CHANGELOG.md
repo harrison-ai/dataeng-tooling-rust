@@ -9,7 +9,7 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
-## 1.60-1.0
+## 1.62-1.0
 
 - Publish both `amd64` and `arm64` docker images. This should provide
   for a much faster build experience for users on aarch64 platforms,
@@ -25,6 +25,10 @@ get CI passing and enable the changes to land on `main`.
   - Docker image building is now performed using `docker buildx`, which in addition
     to simplifying support for multi-platform images, brings a number of efficiency
     and cachability benefits.
+- Updated Rust version to `1.62.0`.
+- Updated OpenSSL to `1.1.1q`.
+- Updated `cargo-deny` to `0.12.1`.
+- Updated `cargo-release` to `0.21.0`.
 - Removed zlib as a pre-built system dependency, as it doesn't seem to be
   needed in practice.
 
