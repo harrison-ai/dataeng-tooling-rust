@@ -128,6 +128,10 @@ RUN tar -xzf openssl-${SSL_VER}.tar.gz && \
 
 ENV CC_x86_64_unknown_linux_musl=x86_64-linux-musl-gcc \
     CC_aarch64_unknown_linux_musl=aarch64-linux-musl-gcc \
+    AR_x86_64_unknown_linux_musl=x86_64-linux-gnu-ar \
+    AR_aarch64_unknown_linux_musl=aarch64-linux-gnu-ar \
+    CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=rust-lld \
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=rust-lld \
     X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=${MUSL_PREFIX}/amd64 \
     AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=${MUSL_PREFIX}/arm64
 
@@ -159,10 +163,6 @@ RUN echo "[build]\ntarget=\"`./docker-target-triple`\"" > ${CARGO_HOME}/config.t
 
 # Build some helpful extra Rust utilities.
 #
-# It seems that `cargo install` needs a bit of extra help in order to cross-compile,
-# which is fair enough, that's not really what it's for. But it works, with some help
-# from $RUSTFLAGS.
-#
 # The use of `sharing=locked` here is to prevent two instances of the install from updating
 # the local registry cache at the same time, which can cause one to fail. Ideally we would
 # only hold the lock while updating the registry cache, rather than while doing the whole
@@ -171,7 +171,6 @@ RUN echo "[build]\ntarget=\"`./docker-target-triple`\"" > ${CARGO_HOME}/config.t
 RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
   --mount=type=cache,target=/build/target \
   export CARGO_BUILD_TARGET=`./docker-target-triple` && \
-  export RUSTFLAGS="-C linker=rust-lld" && \
   # cargo-deny: used for dependency license and security checks.
   # Using `--no-default-features` prevents it trying to compile its own openssl.
   cargo install --version="0.12.1" --no-default-features cargo-deny && \
@@ -231,6 +230,8 @@ ENV CC_x86_64_unknown_linux_musl=x86_64-linux-musl-gcc \
     CC_aarch64_unknown_linux_musl=aarch64-linux-musl-gcc \
     AR_x86_64_unknown_linux_musl=x86_64-linux-gnu-ar \
     AR_aarch64_unknown_linux_musl=aarch64-linux-gnu-ar \
+    CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=rust-lld \
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=rust-lld \
     X86_64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=${MUSL_PREFIX}/amd64 \
     AARCH64_UNKNOWN_LINUX_MUSL_OPENSSL_DIR=${MUSL_PREFIX}/arm64
 

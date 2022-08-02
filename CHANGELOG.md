@@ -9,6 +9,11 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 
+## 1.62-1.2
+
+- Fix linker errors when building `[[bin]]` targets, by explicitly setting the
+  appropriate linker in environment variables.
+
 ## 1.62-1.1
 
 - Updated Rust version to `1.62.1`

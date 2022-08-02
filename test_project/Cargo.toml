@@ -3,6 +3,14 @@ name = "test_project"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "test_project"
+path = "src/lib.rs"
+
+[[bin]]
+name = "test-project"
+path = "src/main.rs"
+
 [dependencies]
 # These dependencies are not actually used by the test program, they're here
 # to check that our toolchain can successfully build them.
