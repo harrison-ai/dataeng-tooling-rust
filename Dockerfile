@@ -177,6 +177,8 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
   # cargo-about: used for generating license files for distribution to consumers,
   #              which may be required for compliance with some open-source licenses.
   cargo install --version="0.5.1" cargo-about && \
+  # cargo-make: used for defining dev & build tasks.
+  cargo install --version="0.36.0" cargo-make && \
   # cargo-release: used for cutting releases.
   cargo install --version="0.21.0" cargo-release
 
@@ -244,6 +246,7 @@ COPY --from=builder ${CARGO_HOME}/config.toml ${CARGO_HOME}/config.toml
 COPY --from=builder \
   ${CARGO_HOME}/bin/cargo-deny \
   ${CARGO_HOME}/bin/cargo-about \
+  ${CARGO_HOME}/bin/cargo-make \
   ${CARGO_HOME}/bin/cargo-release \
   ${CARGO_HOME}/bin/
 
