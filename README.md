@@ -80,6 +80,14 @@ To build the image and publish it to dockerhub:
 make publish
 ```
 
+### Troubleshooting
+
+Ubuntu 22.04 require some packages to run buildx
+
+```sh
+sudo apt-get install binfmt-support qemu-user-static
+```
+
 ## Tags and Versioning
 
 In an attempt to minimise possible confusion for users, the docker image version
