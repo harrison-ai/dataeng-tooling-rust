@@ -74,7 +74,7 @@ To locally build and test the image on both supported platforms:
 make test
 ```
 
-To build the image and publish it to dockerhub:
+To build the image and publish it to github container registry:
 
 ```sh
 make publish
@@ -103,7 +103,7 @@ some version in the `1.56` series, and be the third release of our customization
 on top of that series.
 
 Every commit merged to `main` in this repo creates a new version that is automatically
-built and pushed to dockerhub, with version number updated according to the following
+built and pushed to github container registry, with version number updated according to the following
 rules:
 
 * If the change were purely additive (e.g. installing some additional tools, or a new

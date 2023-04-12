@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Check that we can cleanly publish the current git HEAD to dockerhub.
+# Check that we can cleanly publish the current git HEAD to github container registry.
 # This will fail unless we're on a clean checkout of `main`.
 #
 
