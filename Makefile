@@ -1,7 +1,7 @@
 
 .DEFAULT_GOAL := help
 
-IMAGE="harrisonai/rust"
+IMAGE="ghcr.io/harrison-ai/rust"
 
 # Integrate docker cache with github actions.
 BUILDX_CACHE_FROM =
