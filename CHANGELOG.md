@@ -8,6 +8,10 @@ both the Rust version and our own changes no top; consult [`./README.md`] for de
 Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
+``
+## 1.70-1.1
+
+- Added cargo machete to find unused dependencies.
 
 ## 1.70-1.0
 
