@@ -11,3 +11,6 @@ cargo clippy --all-targets --all-features --no-deps -- -D warnings
 
 # The dependency tree should be compatible with our various policies.
 cargo deny check
+
+# The project should include no used dependencies
+cargo machete
