@@ -180,7 +180,10 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
   # cargo-make: used for defining dev & build tasks.
   cargo install --version="0.36.0" cargo-make && \
   # cargo-release: used for cutting releases.
-  cargo install --version="0.21.0" cargo-release
+  cargo install --version="0.21.0" cargo-release && \
+  # cargo-machete: used for finding unused dependencies.
+  cargo install --version="0.5.0" cargo-machete
+
 
 ####
 #
@@ -248,6 +251,7 @@ COPY --from=builder \
   ${CARGO_HOME}/bin/cargo-about \
   ${CARGO_HOME}/bin/cargo-make \
   ${CARGO_HOME}/bin/cargo-release \
+  ${CARGO_HOME}/bin/cargo-machete \
   ${CARGO_HOME}/bin/
 
 # Add additional not-natively-compiled cargo tooling.

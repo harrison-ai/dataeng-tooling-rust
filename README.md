@@ -11,8 +11,9 @@ The docker image provides:
   `x86_64` and `aarch64` using musl, including support for common system dependencies
   like openssl.
 * Useful project-lifecycle-management tools such as `cargo deny` for auditing
-  dependency licenses, `cargo about` for generating a license summary, and
-  `cargo release` for cutting releases.
+  dependency licenses, `cargo about` for generating a license summary,
+  `cargo release` for cutting releases, `cargo machete` for finding unused
+  dependencies.
 * A custom `cargo hai-all-checks` command to easily run our standard suite of
   quality checks from a CI environment.
 
