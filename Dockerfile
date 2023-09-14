@@ -53,7 +53,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     gcc-aarch64-linux-gnu \
     linux-libc-dev-amd64-cross \
     gcc-x86-64-linux-gnu \
-    linux-libc-dev-arm64-cross
+    linux-libc-dev-arm64-cross \
+    libfindbin-libs-perl
 
 # Build musl, for both target architectures.
 #
@@ -103,10 +104,10 @@ RUN ln -s /usr/bin/aarch64-linux-gnu-ar ${MUSL_PREFIX}/bin/aarch64-linux-musl-ar
 # with cross-compiled static targets, so we provide it as a pre-built dependency. As with musl itself, 
 # for simplicity and consistency, we ship a build for both of the target architectures.
 
-ENV SSL_VER="1.1.1q"
+ENV SSL_VER="1.1.1w"
 
 RUN curl -sSL https://www.openssl.org/source/openssl-${SSL_VER}.tar.gz > openssl-${SSL_VER}.tar.gz && \
-    echo "d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca" \
+    echo "cf3098950cb4d853ad95c0841f1f9c6d3dc102dccfcacd521d93925208b76ac8" \
     openssl-${SSL_VER}.tar.gz | sha256sum --check
 
 RUN tar -xzf openssl-${SSL_VER}.tar.gz && \
