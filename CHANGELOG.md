@@ -9,6 +9,11 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 ``
+
+## 1.72-1.0
+
+- Updated Rust version to `1.72.0`
+
 ## 1.70-1.1
 
 - Added cargo machete to find unused dependencies.
