@@ -35,7 +35,7 @@
 #
 ####
 
-FROM --platform=$BUILDPLATFORM rust:1.73.0-slim AS builder
+FROM --platform=$BUILDPLATFORM rust:1.75.0-slim AS builder
 
 WORKDIR /build
 
@@ -174,16 +174,16 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
   export CARGO_BUILD_TARGET=`./docker-target-triple` && \
   # cargo-deny: used for dependency license and security checks.
   # Using `--no-default-features` prevents it trying to compile its own openssl.
-  cargo install --version="0.12.1" --no-default-features cargo-deny && \
+  cargo install --version="0.14.3" --no-default-features cargo-deny && \
   # cargo-about: used for generating license files for distribution to consumers,
   #              which may be required for compliance with some open-source licenses.
-  cargo install --version="0.5.1" cargo-about && \
+  cargo install --version="0.6.0" cargo-about && \
   # cargo-make: used for defining dev & build tasks.
-  cargo install --version="0.36.0" cargo-make && \
+  cargo install --version="0.37.5" cargo-make && \
   # cargo-release: used for cutting releases.
-  cargo install --version="0.21.0" cargo-release && \
+  cargo install --version="0.25.2" cargo-release && \
   # cargo-machete: used for finding unused dependencies.
-  cargo install --version="0.5.0" cargo-machete
+  cargo install --version="0.6.0" cargo-machete
 
 
 ####
@@ -199,7 +199,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
 #
 ####
 
-FROM rust:1.73.0-slim
+FROM rust:1.75.0-slim
 
 # Install extra system dependencies not included in the slim base image.
 RUN  --mount=type=cache,target=/var/cache/apt,sharing=locked \
