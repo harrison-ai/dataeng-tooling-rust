@@ -173,7 +173,6 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
   --mount=type=cache,target=/build/target \
   export CARGO_BUILD_TARGET=`./docker-target-triple` && \
   # cargo-deny: used for dependency license and security checks.
-  # Using `--no-default-features` prevents it trying to compile its own openssl.
   cargo install --version="0.14.10" cargo-deny && \
   # cargo-about: used for generating license files for distribution to consumers,
   #              which may be required for compliance with some open-source licenses.
