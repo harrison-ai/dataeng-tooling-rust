@@ -10,6 +10,11 @@ a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 ``
 
+## 1.75-1.1
+
+- Bump `cargo-deny` to `0.14.10`
+- Remove `--no-default-features` from the `cargo-deny` install, allowing it to install with default features
+
 ## 1.75-1.0
 
 - Updated Rust version to `1.75.0`
