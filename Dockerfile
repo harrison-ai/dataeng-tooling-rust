@@ -173,14 +173,14 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
   --mount=type=cache,target=/build/target \
   export CARGO_BUILD_TARGET=`./docker-target-triple` && \
   # cargo-deny: used for dependency license and security checks.
-  cargo install --version="0.14.10" cargo-deny && \
+  cargo install --version="0.14.11" cargo-deny && \
   # cargo-about: used for generating license files for distribution to consumers,
   #              which may be required for compliance with some open-source licenses.
-  cargo install --version="0.6.0" cargo-about && \
+  cargo install --version="0.6.1" cargo-about && \
   # cargo-make: used for defining dev & build tasks.
-  cargo install --version="0.37.5" cargo-make && \
+  cargo install --version="0.37.9" cargo-make && \
   # cargo-release: used for cutting releases.
-  cargo install --version="0.25.2" cargo-release && \
+  cargo install --version="0.25.5" cargo-release && \
   # cargo-machete: used for finding unused dependencies.
   cargo install --version="0.6.0" cargo-machete
 
