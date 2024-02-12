@@ -65,11 +65,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 #
 # This will produce `/musl/x86_64/` and `/musl/aarch64/` respectively.
 
-ENV MUSL_VER="1.2.3" \
+ENV MUSL_VER="1.2.4" \
     MUSL_PREFIX=/musl
 
-RUN curl -sSL https://git.musl-libc.org/cgit/musl/snapshot/musl-${MUSL_VER}.tar.gz > musl-${MUSL_VER}.tar.gz && \
-    echo "0504e33a974971ad21cd49213f21a2ff93440f81826b806e57862547abe9b9cf" \
+RUN curl -sSL  https://musl.libc.org/releases/musl-${MUSL_VER}.tar.gz > musl-${MUSL_VER}.tar.gz && \
+    echo "7a35eae33d5372a7c0da1188de798726f68825513b7ae3ebe97aaaa52114f039" \
     musl-${MUSL_VER}.tar.gz | sha256sum --check
 
 RUN tar -xzf musl-${MUSL_VER}.tar.gz && \
