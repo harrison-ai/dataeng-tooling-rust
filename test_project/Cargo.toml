@@ -14,6 +14,6 @@ path = "src/main.rs"
 [dependencies]
 # These dependencies are not actually used by the test program, they're here
 # to check that our toolchain can successfully build them.
-ring = "0.16"
+ring = "0.17"
 openssl-sys = "0.9"
 
