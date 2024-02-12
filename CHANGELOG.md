@@ -13,6 +13,7 @@ get CI passing and enable the changes to land on `main`.
 ## 1.76-0.0
 
 - Updated Rust version to `1.76.0`
+- Updated musl to 1.2.4
 - Updated `cargo-deny` to `0.14.11`
 - Updated `cargo-about` to `0.6.1`
 - Updated `cargo-make` to `0.37.9`
