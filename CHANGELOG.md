@@ -10,6 +10,17 @@ a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 ``
 
+## 1.77-1.0
+
+- Updated Rust version to `1.77.1`
+- Updated musl to `1.2.5`
+- Updated OpenSSL to `3.2.1`
+- Updated `cargo-deny` to `1.14.20`
+- Updated `cargo-make` to `0.37.11`
+- Updated `cargo-release` to `0.25.6`
+- Updated `cargo-machete` to `0.6.2`
+- Added `cargo-sort`
+
 ## 1.76-0.0
 
 - Updated Rust version to `1.76.0`
