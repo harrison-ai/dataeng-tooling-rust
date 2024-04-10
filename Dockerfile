@@ -35,7 +35,7 @@
 #
 ####
 
-FROM --platform=$BUILDPLATFORM rust:1.77.1-slim AS builder
+FROM --platform=$BUILDPLATFORM rust:1.77.2-slim AS builder
 
 WORKDIR /build
 
@@ -200,7 +200,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
 #
 ####
 
-FROM rust:1.77.1-slim
+FROM rust:1.77.2-slim
 
 # Install extra system dependencies not included in the slim base image.
 RUN  --mount=type=cache,target=/var/cache/apt,sharing=locked \
