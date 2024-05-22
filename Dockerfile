@@ -21,7 +21,7 @@
 # pattern described at [1] for efficiently building the images.
 #
 # [1] https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
-# 
+#
 ########
 
 ####
@@ -101,7 +101,7 @@ RUN ln -s /usr/bin/aarch64-linux-gnu-ar ${MUSL_PREFIX}/bin/aarch64-linux-musl-ar
 # Build OpenSSL with our musl toolchain.
 #
 # OpenSSL is unfortunately a common dependency in the Rust ecosystem, and it's fiddly to use
-# with cross-compiled static targets, so we provide it as a pre-built dependency. As with musl itself, 
+# with cross-compiled static targets, so we provide it as a pre-built dependency. As with musl itself,
 # for simplicity and consistency, we ship a build for both of the target architectures.
 
 ENV SSL_VER="3.2.1"
@@ -209,6 +209,7 @@ RUN  --mount=type=cache,target=/var/cache/apt,sharing=locked \
     jq \
     curl \
     make \
+    git \
     ca-certificates \
     gcc-aarch64-linux-gnu \
     linux-libc-dev-amd64-cross \
@@ -254,6 +255,7 @@ COPY --from=builder \
   ${CARGO_HOME}/bin/cargo-make \
   ${CARGO_HOME}/bin/cargo-release \
   ${CARGO_HOME}/bin/cargo-machete \
+  ${CARGO_HOME}/bin/cargo-sort \
   ${CARGO_HOME}/bin/
 
 # Add additional not-natively-compiled cargo tooling.
