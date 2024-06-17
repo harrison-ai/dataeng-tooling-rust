@@ -35,7 +35,7 @@
 #
 ####
 
-FROM --platform=$BUILDPLATFORM rust:1.77.1-slim AS builder
+FROM --platform=$BUILDPLATFORM rust:1.79.0-slim AS builder
 
 WORKDIR /build
 
@@ -104,10 +104,10 @@ RUN ln -s /usr/bin/aarch64-linux-gnu-ar ${MUSL_PREFIX}/bin/aarch64-linux-musl-ar
 # with cross-compiled static targets, so we provide it as a pre-built dependency. As with musl itself,
 # for simplicity and consistency, we ship a build for both of the target architectures.
 
-ENV SSL_VER="3.2.1"
+ENV SSL_VER="3.3.1"
 
 RUN curl -sSL https://www.openssl.org/source/openssl-${SSL_VER}.tar.gz > openssl-${SSL_VER}.tar.gz && \
-    echo "83c7329fe52c850677d75e5d0b0ca245309b97e8ecbcfdc1dfdc4ab9fac35b39" \
+    echo "777cd596284c883375a2a7a11bf5d2786fc5413255efab20c50d6ffe6d020b7e" \
     openssl-${SSL_VER}.tar.gz | sha256sum --check
 
 RUN tar -xzf openssl-${SSL_VER}.tar.gz && \
@@ -173,14 +173,14 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
   --mount=type=cache,target=/build/target \
   export CARGO_BUILD_TARGET=`./docker-target-triple` && \
   # cargo-deny: used for dependency license and security checks.
-  cargo install --version="0.14.20" cargo-deny && \
+  cargo install --version="0.14.24" cargo-deny && \
   # cargo-about: used for generating license files for distribution to consumers,
   #              which may be required for compliance with some open-source licenses.
-  cargo install --version="0.6.1" cargo-about && \
+  cargo install --version="0.6.2" cargo-about && \
   # cargo-make: used for defining dev & build tasks.
-  cargo install --version="0.37.11" cargo-make && \
+  cargo install --version="0.37.13" cargo-make && \
   # cargo-release: used for cutting releases.
-  cargo install --version="0.25.6" cargo-release && \
+  cargo install --version="0.25.10" cargo-release && \
   # cargo-machete: used for finding unused dependencies.
   cargo install --version="0.6.2" cargo-machete && \
   # cargo-sort: used for formatting dependencies in Cargo.toml files.
@@ -200,7 +200,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
 #
 ####
 
-FROM rust:1.77.1-slim
+FROM rust:1.79.0-slim
 
 # Install extra system dependencies not included in the slim base image.
 RUN  --mount=type=cache,target=/var/cache/apt,sharing=locked \
