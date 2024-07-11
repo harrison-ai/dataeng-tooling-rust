@@ -8,8 +8,6 @@
 # and image from it as soon as it lands.
 #
 
-# set -e
-
 THIS_VERSION=`./scripts/version-number.sh`
 MAIN_VERSION=`./scripts/version-number.sh ${GITHUB_BASE_SHA-main}`
 
@@ -23,7 +21,7 @@ if [ -z "${MAIN_VERSION}" ]; then
     exit 1
 fi
 
-echo "Checking main {$MAIN_VERSION} against this version ${THIS_VERSION}"
+echo "Checking main $MAIN_VERSION against this version $THIS_VERSION"
 if ./scripts/check-version-increment.py "${MAIN_VERSION}" "${THIS_VERSION}"; then true; else
     echo ""
     echo "Please update CHANGELOG.md with an appropriate new version number"
