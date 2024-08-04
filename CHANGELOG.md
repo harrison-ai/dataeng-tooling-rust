@@ -10,6 +10,12 @@ a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 ``
 
+## 1.80-0.0
+
+- Updated Rust version to `1.80.0`
+- Updated `cargo-deny` to `1.16.0`
+- Updated `cargo-make` to `0.37.15`
+
 ## 1.79-0.0
 
 - Updated Rust version to `1.79.0`
