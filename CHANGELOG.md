@@ -10,6 +10,14 @@ a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 ``
 
+## 1.82-0.0
+
+- Updated Rust version to `1.82.0`
+- Updated `cargo-make` to `0.37.22`
+- Updated `cargo-release` to `0.25.12`
+- Updated `cargo-machete` to `0.7.0`
+- Fix the 3-Musketeers link in `README.md` being a dead link.
+
 ## 1.81-0.0
 
 - Updated Rust version to `1.81.0`
