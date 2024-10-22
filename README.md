@@ -36,7 +36,7 @@ docker run
     cargo build
 ```
 
-In repositories using the [three-musketeers pattern](https://3musketeers.io/)
+In repositories using the [three-musketeers pattern](https://3musketeers.pages.dev/guide/getting-started.html)
 you can conveniently automate the environment setup in your `docker-compose.yml`
 like this:
 
