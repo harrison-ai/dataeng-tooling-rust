@@ -36,7 +36,7 @@ build: .built.amd64.image .built.arm64.image
 	docker buildx build $(BUILDX_CACHE_FROM) $(BUILDX_CACHE_TO) --platform  linux/amd64,linux/arm64 .
 
 .built.%.image.tar: .built.images
-	# The `.built.iamges` dependency will have exported the cache, don't waste time writing it out again.
+	# The `.built.images` dependency will have exported the cache, don't waste time writing it out again.
 	# It seems that we still need to *read* from the cache again though, at least in CI.
 	docker buildx build $(BUILDX_CACHE_FROM) --platform "linux/$*" --output "type=docker,dest=$@" .
 
