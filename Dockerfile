@@ -35,7 +35,7 @@
 #
 ####
 
-FROM --platform=$BUILDPLATFORM rust:1.84.0-slim AS builder
+FROM --platform=$BUILDPLATFORM rust:1.85.0-slim AS builder
 
 WORKDIR /build
 
@@ -45,8 +45,8 @@ WORKDIR /build
 ## different $TARGETPLATFORM builds.
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-  apt-get update  && \
-  apt-get install -y --no-install-recommends \
+    apt-get update  && \
+    apt-get install -y --no-install-recommends \
     curl \
     make \
     pkg-config \
@@ -170,21 +170,21 @@ RUN echo "[build]\ntarget=\"`./docker-target-triple`\"" > ${CARGO_HOME}/config.t
 # build...but cargo doesn't seem to have a separate "update the registry cache" operation.
 
 RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
-  --mount=type=cache,target=/build/target \
-  export CARGO_BUILD_TARGET=`./docker-target-triple` && \
-  # cargo-deny: used for dependency license and security checks.
-  cargo install --version="0.16.4" cargo-deny && \
-  # cargo-about: used for generating license files for distribution to consumers,
-  #              which may be required for compliance with some open-source licenses.
-  cargo install --version="0.6.6" cargo-about && \
-  # cargo-make: used for defining dev & build tasks.
-  cargo install --version="0.37.24" cargo-make && \
-  # cargo-release: used for cutting releases.
-  cargo install --version="0.25.12" cargo-release && \
-  # cargo-machete: used for finding unused dependencies.
-  cargo install --version="0.7.0" cargo-machete && \
-  # cargo-sort: used for formatting dependencies in Cargo.toml files.
-  cargo install --version="1.0.9" cargo-sort
+    --mount=type=cache,target=/build/target \
+    export CARGO_BUILD_TARGET=`./docker-target-triple` && \
+    # cargo-deny: used for dependency license and security checks.
+    cargo install --version="0.18.0" cargo-deny && \
+    # cargo-about: used for generating license files for distribution to consumers,
+    # which may be required for compliance with some open-source licenses.
+    cargo install --version="0.6.6" cargo-about && \
+    # cargo-make: used for defining dev & build tasks.
+    cargo install --version="0.37.24" cargo-make && \
+    # cargo-release: used for cutting releases.
+    cargo install --version="0.25.17" cargo-release && \
+    # cargo-machete: used for finding unused dependencies.
+    cargo install --version="0.7.0" cargo-machete && \
+    # cargo-sort: used for formatting dependencies in Cargo.toml files.
+    cargo install --version="1.0.9" cargo-sort
 
 
 ####
@@ -200,12 +200,12 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
 #
 ####
 
-FROM rust:1.84.0-slim
+FROM rust:1.85.0-slim
 
 # Install extra system dependencies not included in the slim base image.
 RUN  --mount=type=cache,target=/var/cache/apt,sharing=locked \
-  apt-get update  && \
-  apt-get install -y --no-install-recommends \
+    apt-get update  && \
+    apt-get install -y --no-install-recommends \
     jq \
     curl \
     make \
@@ -222,8 +222,8 @@ RUN rustup component add clippy
 
 # Our two main compilation targets.
 RUN rustup target add \
-  aarch64-unknown-linux-musl \
-  x86_64-unknown-linux-musl
+    aarch64-unknown-linux-musl \
+    x86_64-unknown-linux-musl
 
 # Copy the built musl system-level dependencies and associated config.
 ENV MUSL_PREFIX=/musl
@@ -250,13 +250,13 @@ COPY --from=builder ${CARGO_HOME}/config.toml ${CARGO_HOME}/config.toml
 
 # Copy the built additional cargo tooling.
 COPY --from=builder \
-  ${CARGO_HOME}/bin/cargo-deny \
-  ${CARGO_HOME}/bin/cargo-about \
-  ${CARGO_HOME}/bin/cargo-make \
-  ${CARGO_HOME}/bin/cargo-release \
-  ${CARGO_HOME}/bin/cargo-machete \
-  ${CARGO_HOME}/bin/cargo-sort \
-  ${CARGO_HOME}/bin/
+    ${CARGO_HOME}/bin/cargo-deny \
+    ${CARGO_HOME}/bin/cargo-about \
+    ${CARGO_HOME}/bin/cargo-make \
+    ${CARGO_HOME}/bin/cargo-release \
+    ${CARGO_HOME}/bin/cargo-machete \
+    ${CARGO_HOME}/bin/cargo-sort \
+    ${CARGO_HOME}/bin/
 
 # Add additional not-natively-compiled cargo tooling.
 COPY ./scripts/cargo-hai-all-checks ${CARGO_HOME}/bin/
