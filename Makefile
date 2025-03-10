@@ -17,7 +17,6 @@ DRUN = docker run \
 	--rm \
 	--user $(UID) \
     --volume "`pwd`:/app" \
-    --volume "$(HOME)/.cargo/registry:/usr/local/cargo/registry" \
     --workdir "/app"
 
 ## build:			build docker images for local use
