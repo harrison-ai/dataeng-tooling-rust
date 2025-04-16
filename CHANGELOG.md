@@ -9,6 +9,13 @@ Every commit to `main` in this project creates a new release and hence must have
 a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 ``
+## 1.86-0.0
+
+- Updated Rust version to `1.86.0`
+- Updated `cargo-deny` to `0.18.2`
+- Updated `cargo-about` to `0.7.1`
+- Updated `cargo-release` to `0.25.18`
+
 ## 1.85-0.0
 
 - Updated Rust version to `1.85.0`
