@@ -10,6 +10,15 @@ a new version number. Fill in an appropriate changelog entry in this file to
 get CI passing and enable the changes to land on `main`.
 ``
 
+## 1.91-0.0
+
+- Updated Rust version to `1.91.0`
+- Updated `cargo-deny` to `0.18.5`
+- Updated `cargo-about` to `0.8.2`
+- Updated `cargo-release` to `0.25.20`
+- Updated `cargo-machete` to `0.9.1`
+- Updated `cargo-sort` to `2.0.2`
+
 ## 1.90-0.1
 
 - Explicity use the `bookworm` base image
@@ -17,11 +26,6 @@ get CI passing and enable the changes to land on `main`.
 ## 1.90-0.0
 
 - Updated Rust version to `1.90.0`
-- Updated `cargo-deny` to `0.18.5`
-- Updated `cargo-about` to `0.8.2`
-- Updated `cargo-release` to `0.25.20`
-- Updated `cargo-machete` to `0.9.1`
-- Updated `cargo-sort` to `2.0.2`
 
 ## 1.89-0.0
 
